@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipe Book</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sign In Page -->
+    <div id="signin-page" class="page active">
+        <div class="signin-container">
+            <div class="signin-card">
+                <h1 class="main-title">My Recipe Book</h1>
+                <p class="subtitle">Save and organize your favorite recipes</p>
+                <button id="google-signin-btn" class="google-btn">
+                    <i class="fab fa-google"></i>
+                    Sign in with Google
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard-page" class="page">
+        <header class="header">
+            <h1 class="app-title">My Recipe Book</h1>
+            <div class="header-actions">
+                <button id="add-recipe-btn" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div class="user-info">
+                    <img id="user-photo" class="user-photo" src="" alt="User">
+                    <span id="user-name" class="user-name"></span>
+                    <button id="signout-btn" class="signout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="recipes-grid" class="recipes-grid">
+                <!-- Recipe cards will be dynamically added here -->
+            </div>
+            <div id="empty-state" class="empty-state">
+                <i class="fas fa-utensils"></i>
+                <h2>No recipes yet</h2>
+                <p>Click the + button to add your first recipe!</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Recipe Form Modal -->
+    <div id="recipe-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <input type="text" id="recipe-title" class="recipe-title-input" placeholder="Enter recipe name...">
+                <button id="close-modal" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="recipe-form" class="recipe-form">
+                <div class="form-section">
+                    <h3>Ingredients</h3>
+                    <div id="ingredients-container">
+                        <div class="ingredient-row">
+                            <input type="text" class="ingredient-name" placeholder="Ingredient name" required>
+                            <input type="text" class="ingredient-quantity" placeholder="Quantity" required>
+                            <button type="button" class="remove-ingredient">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-ingredient" class="add-ingredient-btn">
+                        <i class="fas fa-plus"></i> Add Ingredient
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Method</h3>
+                    <textarea id="recipe-method" placeholder="Describe the cooking method step by step..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancel-recipe" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="save-btn">Save Recipe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recipe View Modal -->
+    <div id="view-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="view-recipe-title" class="view-title"></h2>
+                <div class="view-actions">
+                    <button id="edit-recipe" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button id="delete-recipe" class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button id="close-view-modal" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="recipe-content">
+                <div class="ingredients-section">
+                    <h3>Ingredients</h3>
+                    <ul id="view-ingredients" class="ingredients-list"></ul>
+                </div>
+                
+                <div class="method-section">
+                    <h3>Method</h3>
+                    <p id="view-method" class="method-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

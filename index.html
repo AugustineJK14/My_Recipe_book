@@ -9,35 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Sign In Page -->
-    <div id="signin-page" class="page active">
-        <div class="signin-container">
-            <div class="signin-card">
-                <h1 class="main-title">My Recipe Book</h1>
-                <p class="subtitle">Save and organize your favorite recipes</p>
-                <button id="google-signin-btn" class="google-btn">
-                    <i class="fab fa-google"></i>
-                    Sign in with Google
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Dashboard -->
-    <div id="dashboard-page" class="page">
+    <div id="dashboard-page" class="page active">
         <header class="header">
             <h1 class="app-title">My Recipe Book</h1>
             <div class="header-actions">
                 <button id="add-recipe-btn" class="add-btn">
                     <i class="fas fa-plus"></i>
                 </button>
-                <div class="user-info">
-                    <img id="user-photo" class="user-photo" src="" alt="User">
-                    <span id="user-name" class="user-name"></span>
-                    <button id="signout-btn" class="signout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
             </div>
         </header>
 
@@ -125,12 +104,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-    
-    <script type="module" src="firebase-config.js"></script>
+    <!-- Main Application Script -->
     <script type="module" src="app.js"></script>
 </body>
 </html>

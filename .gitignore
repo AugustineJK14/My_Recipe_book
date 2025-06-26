@@ -8,8 +8,9 @@ yarn-error.log*
 /dist
 /build
 
-# Environment variables
+# Environment variables and generated config
 .env
+config.js
 .env.local
 .env.development.local
 .env.test.local

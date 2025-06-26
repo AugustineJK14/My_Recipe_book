@@ -1,34 +1,12 @@
-import { auth, googleProvider, db } from './firebase-config.js';
-import { 
-    signInWithPopup, 
-    signOut, 
-    onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { 
-    collection, 
-    addDoc, 
-    getDocs, 
-    doc, 
-    updateDoc, 
-    deleteDoc, 
-    query, 
-    where, 
-    orderBy,
-    serverTimestamp 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+// Import Supabase client
+import { supabase, testConnection } from './supabase-config.js';
 
 // Global variables
-let currentUser = null;
 let currentRecipeId = null;
 let recipes = [];
+let isOfflineMode = false;
 
 // DOM Elements
-const signinPage = document.getElementById('signin-page');
-const dashboardPage = document.getElementById('dashboard-page');
-const googleSigninBtn = document.getElementById('google-signin-btn');
-const signoutBtn = document.getElementById('signout-btn');
-const userPhoto = document.getElementById('user-photo');
-const userName = document.getElementById('user-name');
 const addRecipeBtn = document.getElementById('add-recipe-btn');
 const recipesGrid = document.getElementById('recipes-grid');
 const emptyState = document.getElementById('empty-state');
@@ -55,26 +33,18 @@ const deleteRecipeBtn = document.getElementById('delete-recipe');
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
-    
-    // Check authentication state
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-            showDashboard();
-            loadUserRecipes();
+    testConnection().then(connected => {
+        if (connected) {
+            loadRecipesFromDB();
         } else {
-            currentUser = null;
-            showSignIn();
+            isOfflineMode = true;
+            loadRecipesFromLocalStorage();
         }
     });
 });
 
 // Event Listeners
 function initializeEventListeners() {
-    // Authentication
-    googleSigninBtn.addEventListener('click', signInWithGoogle);
-    signoutBtn.addEventListener('click', handleSignOut);
-    
     // Recipe management
     addRecipeBtn.addEventListener('click', openRecipeModal);
     closeModalBtn.addEventListener('click', closeRecipeModal);
@@ -99,71 +69,50 @@ function initializeEventListeners() {
     });
 }
 
-// Authentication functions
-async function signInWithGoogle() {
-    try {
-        googleSigninBtn.classList.add('loading');
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('User signed in:', result.user);
-    } catch (error) {
-        console.error('Error signing in:', error);
-        alert('Error signing in. Please try again.');
-    } finally {
-        googleSigninBtn.classList.remove('loading');
-    }
-}
-
-async function handleSignOut() {
-    try {
-        await signOut(auth);
-        console.log('User signed out');
-    } catch (error) {
-        console.error('Error signing out:', error);
-    }
-}
-
-// UI Navigation
-function showSignIn() {
-    signinPage.classList.add('active');
-    dashboardPage.classList.remove('active');
-}
-
-function showDashboard() {
-    signinPage.classList.remove('active');
-    dashboardPage.classList.add('active');
-    
-    // Update user info
-    if (currentUser) {
-        userPhoto.src = currentUser.photoURL || '';
-        userName.textContent = currentUser.displayName || 'User';
-    }
-}
-
 // Recipe Management
-async function loadUserRecipes() {
-    if (!currentUser) return;
-    
-    try {
-        const q = query(
-            collection(db, 'recipes'),
-            where('userId', '==', currentUser.uid),
-            orderBy('createdAt', 'desc')
-        );
-        
-        const querySnapshot = await getDocs(q);
-        recipes = [];
-        
-        querySnapshot.forEach((doc) => {
-            recipes.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-        
-        displayRecipes();
-    } catch (error) {
+async function loadRecipesFromDB() {
+    const { data, error } = await supabase.from('recipes').select('*');
+    if (error) {
         console.error('Error loading recipes:', error);
+        alert('Failed to load recipes from the database. Switching to offline mode.');
+        isOfflineMode = true;
+        loadRecipesFromLocalStorage();
+    } else {
+        recipes = data;
+        displayRecipes();
     }
+}
+
+function loadRecipesFromLocalStorage() {
+    const savedRecipes = localStorage.getItem('myRecipes');
+    // Load recipes from localStorage if available
+    if (savedRecipes) {
+        recipes = JSON.parse(savedRecipes);
+    } else {
+        // Load sample recipe for first time users
+        recipes = [{
+            id: '1',
+            title: 'Spaghetti Bolognese',
+            method: 'Cook the spaghetti according to the package instructions. In a pan, heat some oil over medium heat. Add the onions and garlic, sauté until translucent. Add minced meat, cook until browned. Stir in tomato sauce, let simmer for 10 minutes. Season with salt and pepper. Serve sauce over pasta, garnish with basil leaves.',
+            ingredients: [
+                { name: 'Spaghetti', quantity: '200g' },
+                { name: 'Minced Meat', quantity: '150g' },
+                { name: 'Tomato Sauce', quantity: '100ml' },
+                { name: 'Onion', quantity: '1' },
+                { name: 'Garlic Clove', quantity: '2' },
+                { name: 'Salt', quantity: 'to taste' },
+                { name: 'Pepper', quantity: 'to taste' },
+                { name: 'Basil Leaves', quantity: 'for garnish' }
+            ],
+            createdAt: new Date().toISOString()
+        }];
+        saveRecipesToStorage();
+    }
+    displayRecipes();
+}
+
+function saveRecipesToStorage() {
+    localStorage.setItem('myRecipes', JSON.stringify(recipes));
 }
 
 function displayRecipes() {
@@ -190,7 +139,7 @@ function createRecipeCard(recipe) {
     card.onclick = () => viewRecipe(recipe);
     
     const ingredientCount = recipe.ingredients ? recipe.ingredients.length : 0;
-    const createdDate = recipe.createdAt ? new Date(recipe.createdAt.toDate()).toLocaleDateString() : 'Unknown';
+    const createdDate = recipe.createdAt ? new Date(recipe.createdAt).toLocaleDateString() : 'Unknown';
     
     card.innerHTML = `
         <h3>${recipe.title}</h3>
@@ -258,8 +207,6 @@ function addIngredientRow(name = '', quantity = '') {
 async function saveRecipe(e) {
     e.preventDefault();
     
-    if (!currentUser) return;
-    
     const title = recipeTitleInput.value.trim();
     const method = recipeMethodTextarea.value.trim();
     
@@ -286,30 +233,81 @@ async function saveRecipe(e) {
         return;
     }
     
+    const recipeData = {
+        title,
+        method,
+        ingredients,
+        updated_at: new Date().toISOString()
+    };
+    
+    if (isOfflineMode) {
+        // Save to localStorage in offline mode
+        saveRecipeOffline(recipeData);
+    } else {
+        // Save to Supabase
+        await saveRecipeToSupabase(recipeData);
+    }
+}
+
+function saveRecipeOffline(recipeData) {
+    if (currentRecipeId) {
+        // Update existing recipe
+        const recipeIndex = recipes.findIndex(r => r.id === currentRecipeId);
+        if (recipeIndex !== -1) {
+            recipes[recipeIndex] = { ...recipes[recipeIndex], ...recipeData };
+        }
+    } else {
+        // Create new recipe
+        recipeData.id = 'recipe_' + Date.now();
+        recipeData.created_at = new Date().toISOString();
+        recipes.push(recipeData);
+    }
+    
+    saveRecipesToStorage();
+    closeRecipeModal();
+    displayRecipes();
+}
+
+async function saveRecipeToSupabase(recipeData) {
     try {
-        const recipeData = {
-            title,
-            method,
-            ingredients,
-            userId: currentUser.uid,
-            updatedAt: serverTimestamp()
-        };
-        
         if (currentRecipeId) {
             // Update existing recipe
-            await updateDoc(doc(db, 'recipes', currentRecipeId), recipeData);
+            const { data, error } = await supabase
+                .from('recipes')
+                .update(recipeData)
+                .eq('id', currentRecipeId)
+                .select();
+                
+            if (error) throw error;
+            
+            // Update local recipes array
+            const recipeIndex = recipes.findIndex(r => r.id === currentRecipeId);
+            if (recipeIndex !== -1) {
+                recipes[recipeIndex] = data[0];
+            }
         } else {
             // Create new recipe
-            recipeData.createdAt = serverTimestamp();
-            await addDoc(collection(db, 'recipes'), recipeData);
+            recipeData.created_at = new Date().toISOString();
+            
+            const { data, error } = await supabase
+                .from('recipes')
+                .insert([recipeData])
+                .select();
+                
+            if (error) throw error;
+            
+            // Add to local recipes array
+            recipes.push(data[0]);
         }
         
         closeRecipeModal();
-        await loadUserRecipes();
+        displayRecipes();
         
     } catch (error) {
         console.error('Error saving recipe:', error);
-        alert('Error saving recipe. Please try again.');
+        alert('Failed to save recipe to database. Switching to offline mode.');
+        isOfflineMode = true;
+        saveRecipeOffline(recipeData);
     }
 }
 
@@ -351,13 +349,42 @@ async function deleteCurrentRecipe() {
     if (!currentRecipeId) return;
     
     if (confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
-        try {
-            await deleteDoc(doc(db, 'recipes', currentRecipeId));
+        if (isOfflineMode) {
+            // Delete from localStorage in offline mode
+            recipes = recipes.filter(r => r.id !== currentRecipeId);
+            saveRecipesToStorage();
             closeViewModal();
-            await loadUserRecipes();
-        } catch (error) {
-            console.error('Error deleting recipe:', error);
-            alert('Error deleting recipe. Please try again.');
+            displayRecipes();
+        } else {
+            // Delete from Supabase
+            await deleteRecipeFromSupabase();
         }
+    }
+}
+
+async function deleteRecipeFromSupabase() {
+    try {
+        const { error } = await supabase
+            .from('recipes')
+            .delete()
+            .eq('id', currentRecipeId);
+            
+        if (error) throw error;
+        
+        // Remove from local recipes array
+        recipes = recipes.filter(r => r.id !== currentRecipeId);
+        closeViewModal();
+        displayRecipes();
+        
+    } catch (error) {
+        console.error('Error deleting recipe:', error);
+        alert('Failed to delete recipe from database. Switching to offline mode.');
+        isOfflineMode = true;
+        
+        // Delete locally as fallback
+        recipes = recipes.filter(r => r.id !== currentRecipeId);
+        saveRecipesToStorage();
+        closeViewModal();
+        displayRecipes();
     }
 }

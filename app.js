@@ -53,7 +53,7 @@ function initializeEventListeners() {
     recipeForm.addEventListener('submit', saveRecipe);
     
     // Dynamic ingredients
-    addIngredientBtn.addEventListener('click', addIngredientRow);
+    addIngredientBtn.addEventListener('click', () => addIngredientRow());
     
     // Recipe actions
     editRecipeBtn.addEventListener('click', editCurrentRecipe);
@@ -241,11 +241,11 @@ async function saveRecipe(e) {
     };
     
     if (isOfflineMode) {
-        // Save to localStorage in offline mode
         saveRecipeOffline(recipeData);
+        closeRecipeModal();
     } else {
-        // Save to Supabase
         await saveRecipeToSupabase(recipeData);
+        closeRecipeModal();
     }
 }
 
@@ -264,7 +264,6 @@ function saveRecipeOffline(recipeData) {
     }
     
     saveRecipesToStorage();
-    closeRecipeModal();
     displayRecipes();
 }
 

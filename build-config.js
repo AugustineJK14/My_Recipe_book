@@ -1,23 +1,28 @@
 const fs = require('fs');
 const path = require('path');
 
-// Load .env content
-const envPath = path.join(__dirname, '.env');
-const envContent = fs.readFileSync(envPath, 'utf8');
+// Try to load .env content, but fall back to process.env if not found
+let envVars = {};
 
-// Parse .env lines
-const envVars = {};
-envContent.split('\n').forEach(line => {
-  const trimmedLine = line.trim();
-  if (trimmedLine && !trimmedLine.startsWith('#')) {
-    const [key, ...valueParts] = trimmedLine.split('=');
-    if (key && valueParts.length > 0) {
-      let value = valueParts.join('=').trim();
-      value = value.replace(/^['"]|['"]$/g, ''); // Remove quotes
-      envVars[key] = value;
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const trimmedLine = line.trim();
+    if (trimmedLine && !trimmedLine.startsWith('#')) {
+      const [key, ...valueParts] = trimmedLine.split('=');
+      if (key && valueParts.length > 0) {
+        let value = valueParts.join('=');
+        value = value.replace(/^['"]|['"]$/g, ''); // Remove quotes
+        envVars[key] = value;
+      }
     }
-  }
-});
+  });
+} else {
+  // Use process.env (Vercel)
+  envVars.SUPABASE_URL = process.env.SUPABASE_URL || '';
+  envVars.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+}
 
 // Generate browser-safe config content
 const configContent = `// 🔧 AUTO-GENERATED FROM .env FILE 🔧

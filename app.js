@@ -60,9 +60,9 @@ function initializeEventListeners() {
     deleteRecipeBtn.addEventListener('click', deleteCurrentRecipe);
     
     // Modal backdrop clicks
-    recipeModal.addEventListener('click', (e) => {
-        if (e.target === recipeModal) closeRecipeModal();
-    });
+    // recipeModal.addEventListener('click', (e) => {
+    //     if (e.target === recipeModal) closeRecipeModal();
+    // });
     
     viewModal.addEventListener('click', (e) => {
         if (e.target === viewModal) closeViewModal();

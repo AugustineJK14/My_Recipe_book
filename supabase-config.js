@@ -1,15 +1,17 @@
 // Supabase configuration
 import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
-import { config } from './config.js';
 
 // Load environment variables from config.js (generated from .env)
-const SUPABASE_URL = config.SUPABASE_URL;
-const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+const SUPABASE_URL = window.SUPABASE_CONFIG?.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.SUPABASE_ANON_KEY;
 
 // Validate configuration
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.warn('⚠️ Supabase credentials not found. Please check your .env file and run: node build-config.js');
 }
+
+console.log('SUPABASE_URL:', SUPABASE_URL);
+console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY);
 
 // Create Supabase client
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

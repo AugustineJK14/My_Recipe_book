@@ -4,9 +4,9 @@
   "description": "A personal recipe book application with Supabase authentication and database",
   "main": "index.html",
   "scripts": {
-    "dev": "node build-config.js && npx http-server . -p 3000",
+    "dev": "node build-config.js && serve .",
     "build": "node build-config.js",
-    "start": "node build-config.js && npx http-server . -p 8080",
+    "start": "node build-config.js && serve .",
     "config": "node build-config.js"
   },
   "keywords": [
@@ -19,6 +19,7 @@
   "author": "Recipe Book App",
   "license": "MIT",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "serve": "^14.2.0"
   }
 }

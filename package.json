@@ -1,7 +1,7 @@
 {
   "name": "my-recipe-book",
   "version": "1.0.0",
-  "description": "A personal recipe book application with Firebase authentication and Firestore database",
+  "description": "A personal recipe book application with Supabase authentication and database",
   "main": "index.html",
   "scripts": {
     "dev": "node build-config.js && npx http-server . -p 3000",

@@ -1,6 +1,6 @@
 # My Recipe Book
 
-A beautiful, personal recipe book application with Google authentication and cloud storage. Built with vanilla JavaScript, Firebase, and deployed on Vercel.
+A beautiful, personal recipe book application with Supabase authentication and cloud storage. Built with vanilla JavaScript and deployed on Vercel.
 
 ## Features
 
@@ -10,22 +10,22 @@ A beautiful, personal recipe book application with Google authentication and clo
 - 📝 **Edit Recipes** - Modify existing recipes anytime
 - 🗑️ **Delete Recipes** - Remove recipes you no longer need
 - 🔍 **View Recipes** - Beautiful recipe cards with detailed view
-- ☁️ **Cloud Storage** - Your recipes are saved in Firebase Firestore
+- ☁️ **Cloud Storage** - Your recipes are saved in Supabase
 - 🎨 **Beautiful UI** - Elegant beige color scheme with cursive fonts
 
 ## Setup Instructions
 
-### 1. Firebase Setup
+### 1. Supabase Setup
 
-1. Go to the [Firebase Console](https://console.firebase.google.com/)
+1. Go to the [Supabase Console](https://app.supabase.com/)
 2. Create a new project or use an existing one
 3. Enable **Authentication** and add **Google** as a sign-in provider
 4. Enable **Firestore Database** in test mode
-5. Get your Firebase configuration from Project Settings > General > Your apps
-6. Replace the placeholder values in `firebase-config.js` with your actual Firebase config:
+5. Get your Supabase configuration from Project Settings > API
+6. Replace the placeholder values in `supabase-config.js` with your actual Supabase config:
 
 ```javascript
-const firebaseConfig = {
+const supabaseConfig = {
     apiKey: "your-actual-api-key",
     authDomain: "your-project-id.firebaseapp.com",
     projectId: "your-actual-project-id",
@@ -83,7 +83,7 @@ my-recipe-book/
 ├── index.html          # Main HTML file
 ├── styles.css          # Stylesheet with beige theme
 ├── app.js             # Main JavaScript application
-├── firebase-config.js  # Firebase configuration
+├── supabase-config.js  # Supabase configuration
 ├── package.json       # Node.js dependencies
 └── README.md          # This file
 ```
@@ -104,7 +104,7 @@ my-recipe-book/
 ## Technologies Used
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Authentication**: Firebase Auth with Google Provider
+- **Authentication**: Supabase Auth with Google Provider
 - **Database**: Cloud Firestore
 - **Hosting**: Vercel
 - **Fonts**: Google Fonts (Dancing Script, Poppins)
@@ -124,9 +124,9 @@ MIT License - feel free to use this project for personal or educational purposes
 ## Support
 
 If you encounter any issues:
-1. Check that your Firebase configuration is correct
+1. Check that your Supabase configuration is correct
 2. Ensure Firestore security rules are properly set
-3. Verify that Google Authentication is enabled in Firebase Console
+3. Verify that Google Authentication is enabled in Supabase Console
 4. Check browser console for any error messages
 
 Happy cooking! 🍳
